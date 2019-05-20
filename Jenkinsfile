@@ -1,10 +1,10 @@
 pipeline {
   agent any
   environment {
-    dockerhub_username = '<dockerhub_username>'
+    dockerhub_username = 'cindyclijsters'
     img_name = 'spring-hello'
     img_tag = sh (returnStdout: true, script: 'git log -1 --pretty=%h').trim()
-    username = '<username>'
+    username = 'user3'
   }
   stages {
     stage('Build') {
@@ -16,7 +16,7 @@ pipeline {
     }
     stage('Push') {
       steps {
-        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '<username>', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'user3', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
           sh """
             echo ${WORKSPACE}
             docker login -u ${USERNAME} -p ${PASSWORD}
@@ -26,11 +26,11 @@ pipeline {
         }
       }
     }
-//    stage('Deploy') {
-//      steps {
-//        sh """
-//          helm upgrade --wait --install -f ${username}-backend.yaml --set image.tag=${img_tag} --namespace ${username} --tiller-namespace ${username} ${username}-employee-management-backend ../kubemania/employee-management-backend/
-//        """
+    stage('Deploy') {
+      steps {
+        sh """
+          helm upgrade --wait --install -f ${username}-backend.yaml --set image.tag=${img_tag} --namespace ${username} --tiller-namespace ${username} ${username}-employee-management-backend ../kubemania/employee-management-backend/
+        """
       }
     }
   }
